@@ -37,19 +37,43 @@ jobs:
           ls -la
           tar -zcvf test.tar.gz hello.txt
           ls -la
-      - name: 创建GitHub Release
+      - name: Create ReleaseING
         id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: tag的名称
-          release_name: 发布的名字
-          body: 发布的内容
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./test.tar.gz
+          asset_name: test.tar.gz
+          asset_content_type: application/x-tgz
+      #执行完打包自行下载
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
           path: test.tar.gz
+      # 部署到服务器
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            mkdir gittest
+            cd gittest
+            wget https://github.com/123bcbcpp/gitTest/releases/latest/download/test.tar.gz -O test.tar.gz
+            tar -zxvf test.tar.gz
+            ls -la
       
