@@ -74,7 +74,8 @@ jobs:
           script: |
             mkdir gittest
             cd gittest
-            wget https://github.com/123bcbcpp/gitTest/releases/latest/download/test.tar.gz -O test.tar.gz
+            wget https://ghproxy.com/https://github.com/123bcbcpp/gitTest/releases/latest/download/test.tar.gz -O test.tar.gz
             tar -zxvf test.tar.gz
             ls -la
+            echo "你好" >> f.txt
       
