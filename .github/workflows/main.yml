@@ -35,7 +35,8 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           ls -la
-          tar -zcvf test.tar.gz .
+          tar -zcvf test.tar.gz ./
+          ls -la
       - name: 创建GitHub Release
         id: create_release
         uses: actions/create-release@latest
