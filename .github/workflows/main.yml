@@ -35,3 +35,47 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           ls -la
+          tar -zcvf test.tar.gz hello.txt
+          ls -la
+      - name: Create ReleaseING
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: test
+          release_name: Release test
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./test.tar.gz
+          asset_name: test.tar.gz
+          asset_content_type: application/x-tgz
+      #执行完打包自行下载
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: test.tar.gz
+      # 部署到服务器
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            mkdir gittest
+            cd gittest
+            wget https://ghproxy.com/https://github.com/123bcbcpp/gitTest/releases/latest/download/test.tar.gz -O test.tar.gz
+            tar -zxvf test.tar.gz
+            ls -la
+            echo "你好" >> f.txt
+      
