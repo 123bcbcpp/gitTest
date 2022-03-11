@@ -1,19 +1,8 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: Test GitHubActions
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    tangs:
+      - 'v*'
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -32,9 +21,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          ls -la
           tar -zcvf test.tar.gz hello.txt
           ls -la
       - name: Create ReleaseING
@@ -43,8 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: test
-          release_name: Release test
+          tag_name: ${{ github.ref }}
+          release_name: Release  ${{ github.ref }}
           draft: false
           prerelease: false
           
